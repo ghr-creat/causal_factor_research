@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 历史版本产物（已被 causal_final 取代，不随仓库发布）
+results/causal/
+report/causal/
+
+# 运行日志
+results/causal_final/logs/
+*.log
+
+# 内部质量评审文档（非项目内容）
+/QUALITY_ASSESSMENT.md
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

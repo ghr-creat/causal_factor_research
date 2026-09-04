@@ -1,0 +1,101 @@
+[
+  {
+    "factor": "TURN20",
+    "n_methods_significant": 2,
+    "sign_consistent": true,
+    "mean_ate": 0.01451046284389284,
+    "std_ate": 0.008550874168187204,
+    "cv": 0.5892902425084321,
+    "consistency_label": "一致"
+  },
+  {
+    "factor": "MOM20",
+    "n_methods_significant": 1,
+    "sign_consistent": false,
+    "mean_ate": -0.00794522487638796,
+    "std_ate": 0.009513052629881225,
+    "cv": 1.1973295630879648,
+    "consistency_label": "部分一致"
+  },
+  {
+    "factor": "MOM60",
+    "n_methods_significant": 1,
+    "sign_consistent": false,
+    "mean_ate": -0.009410797989719591,
+    "std_ate": 0.008813569272352155,
+    "cv": 0.936537930362563,
+    "consistency_label": "部分一致"
+  },
+  {
+    "factor": "GROWTH",
+    "n_methods_significant": 0,
+    "sign_consistent": false,
+    "mean_ate": 0.0027436656398712976,
+    "std_ate": 0.0021659827545993386,
+    "cv": 0.7894485111899213,
+    "consistency_label": "不一致"
+  },
+  {
+    "factor": "EP",
+    "n_methods_significant": 0,
+    "sign_consistent": false,
+    "mean_ate": -0.005899162963364801,
+    "std_ate": 0.0029764091058609005,
+    "cv": 0.5045477001305281,
+    "consistency_label": "不一致"
+  },
+  {
+    "factor": "BP",
+    "n_methods_significant": 0,
+    "sign_consistent": false,
+    "mean_ate": 0.0008615344581124792,
+    "std_ate": 0.0034893933146620407,
+    "cv": 4.050207489444928,
+    "consistency_label": "不一致"
+  },
+  {
+    "factor": "LIQ20",
+    "n_methods_significant": 0,
+    "sign_consistent": false,
+    "mean_ate": -0.004918046901190553,
+    "std_ate": 0.0031217142201294093,
+    "cv": 0.6347467364277696,
+    "consistency_label": "不一致"
+  },
+  {
+    "factor": "REV5",
+    "n_methods_significant": 0,
+    "sign_consistent": false,
+    "mean_ate": 0.00545466817738508,
+    "std_ate": 0.008377048712363307,
+    "cv": 1.5357577106329483,
+    "consistency_label": "不一致"
+  },
+  {
+    "factor": "ROA",
+    "n_methods_significant": 0,
+    "sign_consistent": false,
+    "mean_ate": -0.004609948390838038,
+    "std_ate": 0.0037350659273953277,
+    "cv": 0.8102185991536304,
+    "consistency_label": "不一致"
+  },
+  {
+    "factor": "ROE",
+    "n_methods_significant": 0,
+    "sign_consistent": false,
+    "mean_ate": -0.004609948142096736,
+    "std_ate": 0.003735065689172204,
+    "cv": 0.8102185911951255,
+    "consistency_label": "不一致"
+  },
+  {
+    "factor": "VOL20",
+    "n_methods_significant": 0,
+    "sign_consistent": false,
+    "mean_ate": -0.0011883507552025176,
+    "std_ate": 0.008421284953365514,
+    "cv": 7.086531410442338,
+    "consistency_label": "不一致"
+  }
+]

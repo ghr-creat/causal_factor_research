@@ -1,0 +1,2120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>因果推断框架下的多因子选股研究</title>
+<style>
+body { font-family: "Microsoft YaHei", "SimSun", sans-serif; line-height: 1.6; max-width: 900px; margin: 40px auto; padding: 0 20px; color: #333; }
+h1 { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; }
+h2 { border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 30px; }
+table { border-collapse: collapse; width: 100%; margin: 15px 0; font-size: 12px; }
+th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+th { background-color: #f2f2f2; }
+img { max-width: 100%; height: auto; }
+</style>
+</head>
+<body>
+<h1>因果推断框架下的多因子选股研究</h1>
+
+<h2>摘要</h2>
+
+<p>部分传统 IC 显著因子（如 ROA, ROE）在因果推断中并不显著，存在伪因子风险。 因果显著因子包括：MOM60, TURN20。 因果显著因子组合样本外夏普（0.0611）高于 IC 显著因子组合（-0.9493），支持因果因子更稳健的判断。</p>
+
+<h2>因子定义</h2>
+
+<table>
+<thead>
+<tr>
+  <th style="text-align:left;">因子</th>
+  <th style="text-align:left;">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left;">EP</td>
+  <td style="text-align:left;">盈利收益率 Earnings Yield = 1/PE</td>
+</tr>
+<tr>
+  <td style="text-align:left;">BP</td>
+  <td style="text-align:left;">账面市值比 Book-to-Price = 1/PB</td>
+</tr>
+<tr>
+  <td style="text-align:left;">MOM20</td>
+  <td style="text-align:left;">20日动量 (剔除最近1日)</td>
+</tr>
+<tr>
+  <td style="text-align:left;">MOM60</td>
+  <td style="text-align:left;">60日动量 (剔除最近1日)</td>
+</tr>
+<tr>
+  <td style="text-align:left;">ROE</td>
+  <td style="text-align:left;">净资产收益率</td>
+</tr>
+<tr>
+  <td style="text-align:left;">ROA</td>
+  <td style="text-align:left;">总资产收益率</td>
+</tr>
+<tr>
+  <td style="text-align:left;">VOL20</td>
+  <td style="text-align:left;">20日收益波动率 (年化)</td>
+</tr>
+<tr>
+  <td style="text-align:left;">TURN20</td>
+  <td style="text-align:left;">20日平均换手率</td>
+</tr>
+<tr>
+  <td style="text-align:left;">LIQ20</td>
+  <td style="text-align:left;">20日平均成交量 (对数)</td>
+</tr>
+<tr>
+  <td style="text-align:left;">GROWTH</td>
+  <td style="text-align:left;">净利润同比增长率</td>
+</tr>
+<tr>
+  <td style="text-align:left;">REV5</td>
+  <td style="text-align:left;">5日短期反转</td>
+</tr>
+</tbody>
+</table>
+
+<h2>因果发现</h2>
+
+<p>对真实数据进行 <strong>1000 次</strong> Bootstrap 重采样，同时运行 PC 与 FCI 算法。
+共识别 <strong>6</strong> 条稳定边（稳定性 &gt; 70%）。</p>
+
+<p><img src="figures/pc_dag.png" alt="PC 因果图" /></p>
+
+<p><img src="figures/fci_pag.png" alt="FCI 部分祖先图" /></p>
+
+<p><img src="figures/bootstrap_stability_heatmap_pc.png" alt="Bootstrap 稳定性热力图" /></p>
+
+<h2>因果效应估计：四维方法矩阵</h2>
+
+<h3>DML</h3>
+
+<table>
+<thead>
+<tr>
+  <th style="text-align:left;">factor</th>
+  <th style="text-align:left;">method</th>
+  <th style="text-align:right;">ate</th>
+  <th style="text-align:right;">se</th>
+  <th style="text-align:right;">tvalue</th>
+  <th style="text-align:right;">pvalue</th>
+  <th style="text-align:right;">ci_lower</th>
+  <th style="text-align:right;">ci_upper</th>
+  <th style="text-align:right;">ols_beta</th>
+  <th style="text-align:right;">ols_se</th>
+  <th style="text-align:right;">ols_pvalue</th>
+  <th style="text-align:right;">n</th>
+  <th style="text-align:right;">resid<em>D</em>mean</th>
+  <th style="text-align:right;">resid<em>D</em>std</th>
+  <th style="text-align:left;">econml_used</th>
+  <th style="text-align:right;">propensity_overlap</th>
+  <th style="text-align:left;">dml_balanced</th>
+  <th style="text-align:left;">dml<em>overlap</em>ok</th>
+  <th style="text-align:left;">dml_valid</th>
+  <th style="text-align:right;">first<em>stage</em>f</th>
+  <th style="text-align:right;">first<em>stage</em>f_pvalue</th>
+  <th style="text-align:right;">sargan_stat</th>
+  <th style="text-align:right;">sargan_pvalue</th>
+  <th style="text-align:right;">iv_valid</th>
+  <th style="text-align:right;">beta1</th>
+  <th style="text-align:right;">beta2</th>
+  <th style="text-align:right;">beta1_pvalue</th>
+  <th style="text-align:right;">beta2_pvalue</th>
+  <th style="text-align:right;">identification_pass</th>
+  <th style="text-align:right;">fd_valid</th>
+  <th style="text-align:right;">ite_mean</th>
+  <th style="text-align:right;">ite_std</th>
+  <th style="text-align:right;">ite_q10</th>
+  <th style="text-align:right;">ite_q90</th>
+  <th style="text-align:right;">cf_valid</th>
+  <th style="text-align:right;">ite_q01</th>
+  <th style="text-align:right;">ite_q99</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left;">EP</td>
+  <td style="text-align:left;">DML</td>
+  <td style="text-align:right;">-0.00857285</td>
+  <td style="text-align:right;">0.00742469</td>
+  <td style="text-align:right;">-1.15464</td>
+  <td style="text-align:right;">0.248467</td>
+  <td style="text-align:right;">-0.0231396</td>
+  <td style="text-align:right;">0.00599395</td>
+  <td style="text-align:right;">-0.00893832</td>
+  <td style="text-align:right;">0.00551476</td>
+  <td style="text-align:right;">0.105326</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">-0.00713237</td>
+  <td style="text-align:right;">0.409555</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">0.906105</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">BP</td>
+  <td style="text-align:left;">DML</td>
+  <td style="text-align:right;">-0.00222062</td>
+  <td style="text-align:right;">0.00665979</td>
+  <td style="text-align:right;">-0.333437</td>
+  <td style="text-align:right;">0.738863</td>
+  <td style="text-align:right;">-0.0152867</td>
+  <td style="text-align:right;">0.0108455</td>
+  <td style="text-align:right;">0.00591244</td>
+  <td style="text-align:right;">0.005904</td>
+  <td style="text-align:right;">0.316823</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">-0.00555109</td>
+  <td style="text-align:right;">0.455907</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">0.953006</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">MOM20</td>
+  <td style="text-align:left;">DML</td>
+  <td style="text-align:right;">-0.00478444</td>
+  <td style="text-align:right;">0.00365921</td>
+  <td style="text-align:right;">-1.30751</td>
+  <td style="text-align:right;">0.19129</td>
+  <td style="text-align:right;">-0.0119636</td>
+  <td style="text-align:right;">0.0023947</td>
+  <td style="text-align:right;">-0.00182053</td>
+  <td style="text-align:right;">0.00378055</td>
+  <td style="text-align:right;">0.630214</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">0.00122843</td>
+  <td style="text-align:right;">0.827944</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">0.907611</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">MOM60</td>
+  <td style="text-align:left;">DML</td>
+  <td style="text-align:right;">-0.00451168</td>
+  <td style="text-align:right;">0.00369654</td>
+  <td style="text-align:right;">-1.22051</td>
+  <td style="text-align:right;">0.22251</td>
+  <td style="text-align:right;">-0.0117641</td>
+  <td style="text-align:right;">0.00274071</td>
+  <td style="text-align:right;">-0.00619165</td>
+  <td style="text-align:right;">0.00377173</td>
+  <td style="text-align:right;">0.100939</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">-0.00873362</td>
+  <td style="text-align:right;">0.827266</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">0.962704</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">ROE</td>
+  <td style="text-align:left;">DML</td>
+  <td style="text-align:right;">-0.00872118</td>
+  <td style="text-align:right;">0.00628298</td>
+  <td style="text-align:right;">-1.38807</td>
+  <td style="text-align:right;">0.165374</td>
+  <td style="text-align:right;">-0.021048</td>
+  <td style="text-align:right;">0.00360564</td>
+  <td style="text-align:right;">-0.00117537</td>
+  <td style="text-align:right;">0.00492518</td>
+  <td style="text-align:right;">0.811422</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">0.00199207</td>
+  <td style="text-align:right;">0.481548</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">0.920644</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">ROA</td>
+  <td style="text-align:left;">DML</td>
+  <td style="text-align:right;">-0.00872118</td>
+  <td style="text-align:right;">0.00628298</td>
+  <td style="text-align:right;">-1.38807</td>
+  <td style="text-align:right;">0.165374</td>
+  <td style="text-align:right;">-0.021048</td>
+  <td style="text-align:right;">0.00360564</td>
+  <td style="text-align:right;">-0.00117537</td>
+  <td style="text-align:right;">0.00492518</td>
+  <td style="text-align:right;">0.811422</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">0.00199207</td>
+  <td style="text-align:right;">0.481548</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">0.920644</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">VOL20</td>
+  <td style="text-align:left;">DML</td>
+  <td style="text-align:right;">0.00724113</td>
+  <td style="text-align:right;">0.00466498</td>
+  <td style="text-align:right;">1.55223</td>
+  <td style="text-align:right;">0.12087</td>
+  <td style="text-align:right;">-0.00191127</td>
+  <td style="text-align:right;">0.0163935</td>
+  <td style="text-align:right;">0.00773829</td>
+  <td style="text-align:right;">0.00427492</td>
+  <td style="text-align:right;">0.0705237</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">-0.00408788</td>
+  <td style="text-align:right;">0.653391</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">0.938685</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">TURN20</td>
+  <td style="text-align:left;">DML</td>
+  <td style="text-align:right;">0.0201815</td>
+  <td style="text-align:right;">0.00452898</td>
+  <td style="text-align:right;">4.45609</td>
+  <td style="text-align:right;">9.12526e-06</td>
+  <td style="text-align:right;">0.0112959</td>
+  <td style="text-align:right;">0.0290671</td>
+  <td style="text-align:right;">0.0170252</td>
+  <td style="text-align:right;">0.00464027</td>
+  <td style="text-align:right;">0.000254276</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">-0.0068857</td>
+  <td style="text-align:right;">0.669744</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">0.931847</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">LIQ20</td>
+  <td style="text-align:left;">DML</td>
+  <td style="text-align:right;">-0.00323221</td>
+  <td style="text-align:right;">0.0044942</td>
+  <td style="text-align:right;">-0.719195</td>
+  <td style="text-align:right;">0.47216</td>
+  <td style="text-align:right;">-0.0120496</td>
+  <td style="text-align:right;">0.00558515</td>
+  <td style="text-align:right;">-0.00395385</td>
+  <td style="text-align:right;">0.0043787</td>
+  <td style="text-align:right;">0.366724</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">-0.00157423</td>
+  <td style="text-align:right;">0.674771</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">0.924685</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">GROWTH</td>
+  <td style="text-align:left;">DML</td>
+  <td style="text-align:right;">0.00104847</td>
+  <td style="text-align:right;">0.00341233</td>
+  <td style="text-align:right;">0.30726</td>
+  <td style="text-align:right;">0.758698</td>
+  <td style="text-align:right;">-0.00564631</td>
+  <td style="text-align:right;">0.00774326</td>
+  <td style="text-align:right;">0.00276404</td>
+  <td style="text-align:right;">0.0034861</td>
+  <td style="text-align:right;">0.428009</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">-0.0169922</td>
+  <td style="text-align:right;">0.898021</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">0.891543</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">REV5</td>
+  <td style="text-align:left;">DML</td>
+  <td style="text-align:right;">-0.00014071</td>
+  <td style="text-align:right;">0.0032584</td>
+  <td style="text-align:right;">-0.0431838</td>
+  <td style="text-align:right;">0.965562</td>
+  <td style="text-align:right;">-0.0065335</td>
+  <td style="text-align:right;">0.00625208</td>
+  <td style="text-align:right;">0.00045455</td>
+  <td style="text-align:right;">0.00341556</td>
+  <td style="text-align:right;">0.894151</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">-0.0122344</td>
+  <td style="text-align:right;">0.938229</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">0.918317</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+</tbody>
+</table>
+
+<h3>IV</h3>
+
+<table>
+<thead>
+<tr>
+  <th style="text-align:left;">factor</th>
+  <th style="text-align:left;">method</th>
+  <th style="text-align:right;">ate</th>
+  <th style="text-align:right;">se</th>
+  <th style="text-align:right;">tvalue</th>
+  <th style="text-align:right;">pvalue</th>
+  <th style="text-align:right;">ci_lower</th>
+  <th style="text-align:right;">ci_upper</th>
+  <th style="text-align:right;">ols_beta</th>
+  <th style="text-align:right;">ols_se</th>
+  <th style="text-align:right;">ols_pvalue</th>
+  <th style="text-align:right;">n</th>
+  <th style="text-align:right;">resid<em>D</em>mean</th>
+  <th style="text-align:right;">resid<em>D</em>std</th>
+  <th style="text-align:right;">econml_used</th>
+  <th style="text-align:right;">propensity_overlap</th>
+  <th style="text-align:right;">dml_balanced</th>
+  <th style="text-align:right;">dml<em>overlap</em>ok</th>
+  <th style="text-align:right;">dml_valid</th>
+  <th style="text-align:right;">first<em>stage</em>f</th>
+  <th style="text-align:right;">first<em>stage</em>f_pvalue</th>
+  <th style="text-align:right;">sargan_stat</th>
+  <th style="text-align:right;">sargan_pvalue</th>
+  <th style="text-align:left;">iv_valid</th>
+  <th style="text-align:right;">beta1</th>
+  <th style="text-align:right;">beta2</th>
+  <th style="text-align:right;">beta1_pvalue</th>
+  <th style="text-align:right;">beta2_pvalue</th>
+  <th style="text-align:right;">identification_pass</th>
+  <th style="text-align:right;">fd_valid</th>
+  <th style="text-align:right;">ite_mean</th>
+  <th style="text-align:right;">ite_std</th>
+  <th style="text-align:right;">ite_q10</th>
+  <th style="text-align:right;">ite_q90</th>
+  <th style="text-align:right;">cf_valid</th>
+  <th style="text-align:right;">ite_q01</th>
+  <th style="text-align:right;">ite_q99</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left;">EP</td>
+  <td style="text-align:left;">IV</td>
+  <td style="text-align:right;">-0.00990085</td>
+  <td style="text-align:right;">0.00636159</td>
+  <td style="text-align:right;">-1.55635</td>
+  <td style="text-align:right;">0.119978</td>
+  <td style="text-align:right;">-0.0223862</td>
+  <td style="text-align:right;">0.00258448</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">914</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">2678.65</td>
+  <td style="text-align:right;">0</td>
+  <td style="text-align:right;">0.269279</td>
+  <td style="text-align:right;">0.603816</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">BP</td>
+  <td style="text-align:left;">IV</td>
+  <td style="text-align:right;">0.00689673</td>
+  <td style="text-align:right;">0.00655677</td>
+  <td style="text-align:right;">1.05185</td>
+  <td style="text-align:right;">0.293152</td>
+  <td style="text-align:right;">-0.00597166</td>
+  <td style="text-align:right;">0.0197651</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">914</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">12733.3</td>
+  <td style="text-align:right;">0</td>
+  <td style="text-align:right;">8.71958e-08</td>
+  <td style="text-align:right;">0.999764</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">MOM20</td>
+  <td style="text-align:left;">IV</td>
+  <td style="text-align:right;">-0.0239336</td>
+  <td style="text-align:right;">0.00907722</td>
+  <td style="text-align:right;">-2.63667</td>
+  <td style="text-align:right;">0.0085171</td>
+  <td style="text-align:right;">-0.0417487</td>
+  <td style="text-align:right;">-0.00611859</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">914</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">115.458</td>
+  <td style="text-align:right;">2.43463e-45</td>
+  <td style="text-align:right;">1.2987</td>
+  <td style="text-align:right;">0.254451</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">MOM60</td>
+  <td style="text-align:left;">IV</td>
+  <td style="text-align:right;">-0.0246104</td>
+  <td style="text-align:right;">0.00582484</td>
+  <td style="text-align:right;">-4.22508</td>
+  <td style="text-align:right;">2.63266e-05</td>
+  <td style="text-align:right;">-0.0360423</td>
+  <td style="text-align:right;">-0.0131785</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">914</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">428.892</td>
+  <td style="text-align:right;">2.15166e-131</td>
+  <td style="text-align:right;">0.260075</td>
+  <td style="text-align:right;">0.610069</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">ROE</td>
+  <td style="text-align:left;">IV</td>
+  <td style="text-align:right;">-0.00635726</td>
+  <td style="text-align:right;">0.00572819</td>
+  <td style="text-align:right;">-1.10982</td>
+  <td style="text-align:right;">0.267374</td>
+  <td style="text-align:right;">-0.0175995</td>
+  <td style="text-align:right;">0.00488496</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">914</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">2211.46</td>
+  <td style="text-align:right;">0</td>
+  <td style="text-align:right;">3.10534</td>
+  <td style="text-align:right;">0.0780358</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">ROA</td>
+  <td style="text-align:left;">IV</td>
+  <td style="text-align:right;">-0.00635726</td>
+  <td style="text-align:right;">0.00572819</td>
+  <td style="text-align:right;">-1.10982</td>
+  <td style="text-align:right;">0.267374</td>
+  <td style="text-align:right;">-0.0175995</td>
+  <td style="text-align:right;">0.00488496</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">914</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">2211.46</td>
+  <td style="text-align:right;">0</td>
+  <td style="text-align:right;">3.10534</td>
+  <td style="text-align:right;">0.0780358</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">VOL20</td>
+  <td style="text-align:left;">IV</td>
+  <td style="text-align:right;">-0.0139388</td>
+  <td style="text-align:right;">0.0137797</td>
+  <td style="text-align:right;">-1.01155</td>
+  <td style="text-align:right;">0.312027</td>
+  <td style="text-align:right;">-0.040983</td>
+  <td style="text-align:right;">0.0131054</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">914</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">60.5847</td>
+  <td style="text-align:right;">2.09799e-25</td>
+  <td style="text-align:right;">0.645394</td>
+  <td style="text-align:right;">0.421764</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">TURN20</td>
+  <td style="text-align:left;">IV</td>
+  <td style="text-align:right;">0.0193613</td>
+  <td style="text-align:right;">0.00662027</td>
+  <td style="text-align:right;">2.92455</td>
+  <td style="text-align:right;">0.00353643</td>
+  <td style="text-align:right;">0.00636828</td>
+  <td style="text-align:right;">0.0323543</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">914</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">808.772</td>
+  <td style="text-align:right;">2.02133e-201</td>
+  <td style="text-align:right;">5.08927</td>
+  <td style="text-align:right;">0.0240743</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">LIQ20</td>
+  <td style="text-align:left;">IV</td>
+  <td style="text-align:right;">-0.00933803</td>
+  <td style="text-align:right;">0.00529876</td>
+  <td style="text-align:right;">-1.7623</td>
+  <td style="text-align:right;">0.0783584</td>
+  <td style="text-align:right;">-0.0197374</td>
+  <td style="text-align:right;">0.00106138</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">914</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">2980.15</td>
+  <td style="text-align:right;">0</td>
+  <td style="text-align:right;">0.0538033</td>
+  <td style="text-align:right;">0.816573</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">GROWTH</td>
+  <td style="text-align:left;">IV</td>
+  <td style="text-align:right;">0.00639981</td>
+  <td style="text-align:right;">0.00473432</td>
+  <td style="text-align:right;">1.35179</td>
+  <td style="text-align:right;">0.176783</td>
+  <td style="text-align:right;">-0.00289183</td>
+  <td style="text-align:right;">0.0156914</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">914</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1029.49</td>
+  <td style="text-align:right;">6.69956e-233</td>
+  <td style="text-align:right;">2.02263</td>
+  <td style="text-align:right;">0.154971</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">REV5</td>
+  <td style="text-align:left;">IV</td>
+  <td style="text-align:right;">0.019815</td>
+  <td style="text-align:right;">0.0108833</td>
+  <td style="text-align:right;">1.82068</td>
+  <td style="text-align:right;">0.0689886</td>
+  <td style="text-align:right;">-0.00154469</td>
+  <td style="text-align:right;">0.0411747</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">914</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">61.1991</td>
+  <td style="text-align:right;">1.22154e-25</td>
+  <td style="text-align:right;">9.86089</td>
+  <td style="text-align:right;">0.00168829</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+</tbody>
+</table>
+
+<h3>前门调整</h3>
+
+<table>
+<thead>
+<tr>
+  <th style="text-align:left;">factor</th>
+  <th style="text-align:left;">method</th>
+  <th style="text-align:right;">ate</th>
+  <th style="text-align:right;">se</th>
+  <th style="text-align:right;">tvalue</th>
+  <th style="text-align:right;">pvalue</th>
+  <th style="text-align:right;">ci_lower</th>
+  <th style="text-align:right;">ci_upper</th>
+  <th style="text-align:right;">ols_beta</th>
+  <th style="text-align:right;">ols_se</th>
+  <th style="text-align:right;">ols_pvalue</th>
+  <th style="text-align:right;">n</th>
+  <th style="text-align:right;">resid<em>D</em>mean</th>
+  <th style="text-align:right;">resid<em>D</em>std</th>
+  <th style="text-align:right;">econml_used</th>
+  <th style="text-align:right;">propensity_overlap</th>
+  <th style="text-align:right;">dml_balanced</th>
+  <th style="text-align:right;">dml<em>overlap</em>ok</th>
+  <th style="text-align:right;">dml_valid</th>
+  <th style="text-align:right;">first<em>stage</em>f</th>
+  <th style="text-align:right;">first<em>stage</em>f_pvalue</th>
+  <th style="text-align:right;">sargan_stat</th>
+  <th style="text-align:right;">sargan_pvalue</th>
+  <th style="text-align:right;">iv_valid</th>
+  <th style="text-align:right;">beta1</th>
+  <th style="text-align:right;">beta2</th>
+  <th style="text-align:right;">beta1_pvalue</th>
+  <th style="text-align:right;">beta2_pvalue</th>
+  <th style="text-align:left;">identification_pass</th>
+  <th style="text-align:left;">fd_valid</th>
+  <th style="text-align:right;">ite_mean</th>
+  <th style="text-align:right;">ite_std</th>
+  <th style="text-align:right;">ite_q10</th>
+  <th style="text-align:right;">ite_q90</th>
+  <th style="text-align:right;">cf_valid</th>
+  <th style="text-align:right;">ite_q01</th>
+  <th style="text-align:right;">ite_q99</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left;">EP</td>
+  <td style="text-align:left;">FrontDoor</td>
+  <td style="text-align:right;">-0.001501</td>
+  <td style="text-align:right;">0.00219062</td>
+  <td style="text-align:right;">-0.685196</td>
+  <td style="text-align:right;">0.493353</td>
+  <td style="text-align:right;">-0.00579461</td>
+  <td style="text-align:right;">0.00279261</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">-0.00165661</td>
+  <td style="text-align:right;">0.906069</td>
+  <td style="text-align:right;">0.492896</td>
+  <td style="text-align:right;">4.37287e-46</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">BP</td>
+  <td style="text-align:left;">FrontDoor</td>
+  <td style="text-align:right;">-0.00145412</td>
+  <td style="text-align:right;">0.00234478</td>
+  <td style="text-align:right;">-0.62015</td>
+  <td style="text-align:right;">0.535277</td>
+  <td style="text-align:right;">-0.00604989</td>
+  <td style="text-align:right;">0.00314166</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">-0.00160486</td>
+  <td style="text-align:right;">0.906069</td>
+  <td style="text-align:right;">0.534924</td>
+  <td style="text-align:right;">4.37287e-46</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">MOM20</td>
+  <td style="text-align:left;">FrontDoor</td>
+  <td style="text-align:right;">0.00113945</td>
+  <td style="text-align:right;">0.0015021</td>
+  <td style="text-align:right;">0.758571</td>
+  <td style="text-align:right;">0.448258</td>
+  <td style="text-align:right;">-0.00180467</td>
+  <td style="text-align:right;">0.00408357</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">0.00125758</td>
+  <td style="text-align:right;">0.906069</td>
+  <td style="text-align:right;">0.44767</td>
+  <td style="text-align:right;">4.37287e-46</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">MOM60</td>
+  <td style="text-align:left;">FrontDoor</td>
+  <td style="text-align:right;">-0.0030085</td>
+  <td style="text-align:right;">0.00151023</td>
+  <td style="text-align:right;">-1.99208</td>
+  <td style="text-align:right;">0.0465882</td>
+  <td style="text-align:right;">-0.00596855</td>
+  <td style="text-align:right;">-4.8448e-05</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">-0.00332039</td>
+  <td style="text-align:right;">0.906069</td>
+  <td style="text-align:right;">0.0446405</td>
+  <td style="text-align:right;">4.37287e-46</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">ROE</td>
+  <td style="text-align:left;">FrontDoor</td>
+  <td style="text-align:right;">0.00184437</td>
+  <td style="text-align:right;">0.00195827</td>
+  <td style="text-align:right;">0.941835</td>
+  <td style="text-align:right;">0.346466</td>
+  <td style="text-align:right;">-0.00199384</td>
+  <td style="text-align:right;">0.00568258</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">0.00203557</td>
+  <td style="text-align:right;">0.906069</td>
+  <td style="text-align:right;">0.345502</td>
+  <td style="text-align:right;">4.37287e-46</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">ROA</td>
+  <td style="text-align:left;">FrontDoor</td>
+  <td style="text-align:right;">0.00184437</td>
+  <td style="text-align:right;">0.00195827</td>
+  <td style="text-align:right;">0.941835</td>
+  <td style="text-align:right;">0.346466</td>
+  <td style="text-align:right;">-0.00199384</td>
+  <td style="text-align:right;">0.00568258</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">0.00203557</td>
+  <td style="text-align:right;">0.906069</td>
+  <td style="text-align:right;">0.345502</td>
+  <td style="text-align:right;">4.37287e-46</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">VOL20</td>
+  <td style="text-align:left;">FrontDoor</td>
+  <td style="text-align:right;">-0.00361625</td>
+  <td style="text-align:right;">0.00171362</td>
+  <td style="text-align:right;">-2.1103</td>
+  <td style="text-align:right;">0.035039</td>
+  <td style="text-align:right;">-0.00697494</td>
+  <td style="text-align:right;">-0.000257551</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">-0.00399114</td>
+  <td style="text-align:right;">0.906069</td>
+  <td style="text-align:right;">0.0332264</td>
+  <td style="text-align:right;">4.37287e-46</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">TURN20</td>
+  <td style="text-align:left;">FrontDoor</td>
+  <td style="text-align:right;">-0.000299802</td>
+  <td style="text-align:right;">0.0018414</td>
+  <td style="text-align:right;">-0.162812</td>
+  <td style="text-align:right;">0.870694</td>
+  <td style="text-align:right;">-0.00390895</td>
+  <td style="text-align:right;">0.00330934</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">-0.000330882</td>
+  <td style="text-align:right;">0.906069</td>
+  <td style="text-align:right;">0.870686</td>
+  <td style="text-align:right;">4.37287e-46</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">LIQ20</td>
+  <td style="text-align:left;">FrontDoor</td>
+  <td style="text-align:right;">-0.000508531</td>
+  <td style="text-align:right;">0.00173784</td>
+  <td style="text-align:right;">-0.292623</td>
+  <td style="text-align:right;">0.769861</td>
+  <td style="text-align:right;">-0.00391469</td>
+  <td style="text-align:right;">0.00289763</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">-0.00056125</td>
+  <td style="text-align:right;">0.906069</td>
+  <td style="text-align:right;">0.769818</td>
+  <td style="text-align:right;">4.37287e-46</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">GROWTH</td>
+  <td style="text-align:left;">FrontDoor</td>
+  <td style="text-align:right;">0.000732737</td>
+  <td style="text-align:right;">0.00138418</td>
+  <td style="text-align:right;">0.529364</td>
+  <td style="text-align:right;">0.59665</td>
+  <td style="text-align:right;">-0.00198026</td>
+  <td style="text-align:right;">0.00344574</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">0.0008087</td>
+  <td style="text-align:right;">0.906069</td>
+  <td style="text-align:right;">0.596419</td>
+  <td style="text-align:right;">4.37287e-46</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+<tr>
+  <td style="text-align:left;">REV5</td>
+  <td style="text-align:left;">FrontDoor</td>
+  <td style="text-align:right;">-0.00128752</td>
+  <td style="text-align:right;">0.00135807</td>
+  <td style="text-align:right;">-0.948051</td>
+  <td style="text-align:right;">0.343294</td>
+  <td style="text-align:right;">-0.00394934</td>
+  <td style="text-align:right;">0.0013743</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">-0.001421</td>
+  <td style="text-align:right;">0.906069</td>
+  <td style="text-align:right;">0.342316</td>
+  <td style="text-align:right;">4.37287e-46</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:left;">False</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+</tr>
+</tbody>
+</table>
+
+<h3>Causal Forest</h3>
+
+<table>
+<thead>
+<tr>
+  <th style="text-align:left;">factor</th>
+  <th style="text-align:left;">method</th>
+  <th style="text-align:right;">ate</th>
+  <th style="text-align:right;">se</th>
+  <th style="text-align:right;">tvalue</th>
+  <th style="text-align:right;">pvalue</th>
+  <th style="text-align:right;">ci_lower</th>
+  <th style="text-align:right;">ci_upper</th>
+  <th style="text-align:right;">ols_beta</th>
+  <th style="text-align:right;">ols_se</th>
+  <th style="text-align:right;">ols_pvalue</th>
+  <th style="text-align:right;">n</th>
+  <th style="text-align:right;">resid<em>D</em>mean</th>
+  <th style="text-align:right;">resid<em>D</em>std</th>
+  <th style="text-align:left;">econml_used</th>
+  <th style="text-align:right;">propensity_overlap</th>
+  <th style="text-align:right;">dml_balanced</th>
+  <th style="text-align:right;">dml<em>overlap</em>ok</th>
+  <th style="text-align:right;">dml_valid</th>
+  <th style="text-align:right;">first<em>stage</em>f</th>
+  <th style="text-align:right;">first<em>stage</em>f_pvalue</th>
+  <th style="text-align:right;">sargan_stat</th>
+  <th style="text-align:right;">sargan_pvalue</th>
+  <th style="text-align:right;">iv_valid</th>
+  <th style="text-align:right;">beta1</th>
+  <th style="text-align:right;">beta2</th>
+  <th style="text-align:right;">beta1_pvalue</th>
+  <th style="text-align:right;">beta2_pvalue</th>
+  <th style="text-align:right;">identification_pass</th>
+  <th style="text-align:right;">fd_valid</th>
+  <th style="text-align:right;">ite_mean</th>
+  <th style="text-align:right;">ite_std</th>
+  <th style="text-align:right;">ite_q10</th>
+  <th style="text-align:right;">ite_q90</th>
+  <th style="text-align:left;">cf_valid</th>
+  <th style="text-align:right;">ite_q01</th>
+  <th style="text-align:right;">ite_q99</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left;">EP</td>
+  <td style="text-align:left;">CausalForest</td>
+  <td style="text-align:right;">-0.00719979</td>
+  <td style="text-align:right;">0.00725584</td>
+  <td style="text-align:right;">-0.992275</td>
+  <td style="text-align:right;">0.321263</td>
+  <td style="text-align:right;">-0.0214212</td>
+  <td style="text-align:right;">0.00702165</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">-0.00720898</td>
+  <td style="text-align:right;">0.00678043</td>
+  <td style="text-align:right;">-0.0143999</td>
+  <td style="text-align:right;">0.00298055</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">-0.0175936</td>
+  <td style="text-align:right;">0.0111855</td>
+</tr>
+<tr>
+  <td style="text-align:left;">BP</td>
+  <td style="text-align:left;">CausalForest</td>
+  <td style="text-align:right;">-0.00331375</td>
+  <td style="text-align:right;">0.0072668</td>
+  <td style="text-align:right;">-0.456013</td>
+  <td style="text-align:right;">0.648463</td>
+  <td style="text-align:right;">-0.0175567</td>
+  <td style="text-align:right;">0.0109292</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">-0.0033218</td>
+  <td style="text-align:right;">0.008943</td>
+  <td style="text-align:right;">-0.0155796</td>
+  <td style="text-align:right;">0.00857933</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">-0.0188033</td>
+  <td style="text-align:right;">0.0180142</td>
+</tr>
+<tr>
+  <td style="text-align:left;">MOM20</td>
+  <td style="text-align:left;">CausalForest</td>
+  <td style="text-align:right;">-0.00416183</td>
+  <td style="text-align:right;">0.00941248</td>
+  <td style="text-align:right;">-0.442161</td>
+  <td style="text-align:right;">0.658452</td>
+  <td style="text-align:right;">-0.0226103</td>
+  <td style="text-align:right;">0.0142866</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">-0.00417584</td>
+  <td style="text-align:right;">0.00966362</td>
+  <td style="text-align:right;">-0.0136015</td>
+  <td style="text-align:right;">0.00727057</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">-0.0184318</td>
+  <td style="text-align:right;">0.0341614</td>
+</tr>
+<tr>
+  <td style="text-align:left;">MOM60</td>
+  <td style="text-align:left;">CausalForest</td>
+  <td style="text-align:right;">-0.00279208</td>
+  <td style="text-align:right;">0.00799013</td>
+  <td style="text-align:right;">-0.349441</td>
+  <td style="text-align:right;">0.72682</td>
+  <td style="text-align:right;">-0.0184527</td>
+  <td style="text-align:right;">0.0128686</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">-0.00278765</td>
+  <td style="text-align:right;">0.00679323</td>
+  <td style="text-align:right;">-0.0136503</td>
+  <td style="text-align:right;">0.00385313</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">-0.0228029</td>
+  <td style="text-align:right;">0.00846197</td>
+</tr>
+<tr>
+  <td style="text-align:left;">ROE</td>
+  <td style="text-align:left;">CausalForest</td>
+  <td style="text-align:right;">-0.00388849</td>
+  <td style="text-align:right;">0.00721611</td>
+  <td style="text-align:right;">-0.538862</td>
+  <td style="text-align:right;">0.590081</td>
+  <td style="text-align:right;">-0.0180321</td>
+  <td style="text-align:right;">0.0102551</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">-0.0038947</td>
+  <td style="text-align:right;">0.0081383</td>
+  <td style="text-align:right;">-0.0138347</td>
+  <td style="text-align:right;">0.00636456</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">-0.0186441</td>
+  <td style="text-align:right;">0.0181418</td>
+</tr>
+<tr>
+  <td style="text-align:left;">ROA</td>
+  <td style="text-align:left;">CausalForest</td>
+  <td style="text-align:right;">-0.00388849</td>
+  <td style="text-align:right;">0.00721611</td>
+  <td style="text-align:right;">-0.538862</td>
+  <td style="text-align:right;">0.590081</td>
+  <td style="text-align:right;">-0.0180321</td>
+  <td style="text-align:right;">0.0102551</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">-0.0038947</td>
+  <td style="text-align:right;">0.0081383</td>
+  <td style="text-align:right;">-0.0138347</td>
+  <td style="text-align:right;">0.00636456</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">-0.0186441</td>
+  <td style="text-align:right;">0.0181418</td>
+</tr>
+<tr>
+  <td style="text-align:left;">VOL20</td>
+  <td style="text-align:left;">CausalForest</td>
+  <td style="text-align:right;">0.0150985</td>
+  <td style="text-align:right;">0.00741533</td>
+  <td style="text-align:right;">2.03612</td>
+  <td style="text-align:right;">0.0419571</td>
+  <td style="text-align:right;">0.000564447</td>
+  <td style="text-align:right;">0.0296326</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">0.0151039</td>
+  <td style="text-align:right;">0.0109709</td>
+  <td style="text-align:right;">0.00464651</td>
+  <td style="text-align:right;">0.0338626</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">0.000363004</td>
+  <td style="text-align:right;">0.0414409</td>
+</tr>
+<tr>
+  <td style="text-align:left;">TURN20</td>
+  <td style="text-align:left;">CausalForest</td>
+  <td style="text-align:right;">0.0185426</td>
+  <td style="text-align:right;">0.00766396</td>
+  <td style="text-align:right;">2.41946</td>
+  <td style="text-align:right;">0.0156912</td>
+  <td style="text-align:right;">0.00352127</td>
+  <td style="text-align:right;">0.033564</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">0.0185345</td>
+  <td style="text-align:right;">0.0117737</td>
+  <td style="text-align:right;">0.00670172</td>
+  <td style="text-align:right;">0.0381448</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">0.00152755</td>
+  <td style="text-align:right;">0.0465507</td>
+</tr>
+<tr>
+  <td style="text-align:left;">LIQ20</td>
+  <td style="text-align:left;">CausalForest</td>
+  <td style="text-align:right;">0.00652006</td>
+  <td style="text-align:right;">0.00863205</td>
+  <td style="text-align:right;">0.755331</td>
+  <td style="text-align:right;">0.450198</td>
+  <td style="text-align:right;">-0.0103988</td>
+  <td style="text-align:right;">0.0234389</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">0.00652733</td>
+  <td style="text-align:right;">0.0160645</td>
+  <td style="text-align:right;">-0.0130263</td>
+  <td style="text-align:right;">0.0321869</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">-0.0227175</td>
+  <td style="text-align:right;">0.0373305</td>
+</tr>
+<tr>
+  <td style="text-align:left;">GROWTH</td>
+  <td style="text-align:left;">CausalForest</td>
+  <td style="text-align:right;">0.00476789</td>
+  <td style="text-align:right;">0.00748016</td>
+  <td style="text-align:right;">0.637404</td>
+  <td style="text-align:right;">0.523983</td>
+  <td style="text-align:right;">-0.00989323</td>
+  <td style="text-align:right;">0.019429</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">0.0047747</td>
+  <td style="text-align:right;">0.0110003</td>
+  <td style="text-align:right;">-0.0130164</td>
+  <td style="text-align:right;">0.0164548</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">-0.0266389</td>
+  <td style="text-align:right;">0.0234223</td>
+</tr>
+<tr>
+  <td style="text-align:left;">REV5</td>
+  <td style="text-align:left;">CausalForest</td>
+  <td style="text-align:right;">0.00204593</td>
+  <td style="text-align:right;">0.00868351</td>
+  <td style="text-align:right;">0.23561</td>
+  <td style="text-align:right;">0.813775</td>
+  <td style="text-align:right;">-0.0149738</td>
+  <td style="text-align:right;">0.0190656</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">1204</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">nan</td>
+  <td style="text-align:right;">0.00205288</td>
+  <td style="text-align:right;">0.0135597</td>
+  <td style="text-align:right;">-0.0103194</td>
+  <td style="text-align:right;">0.0258653</td>
+  <td style="text-align:left;">True</td>
+  <td style="text-align:right;">-0.0227718</td>
+  <td style="text-align:right;">0.0307508</td>
+</tr>
+</tbody>
+</table>
+
+<p><img src="figures/causal_effect_comparison.png" alt="四种方法 ATE 对比" /></p>
+
+<h2>因果因子 vs 相关因子</h2>
+
+<h3>2×2 分类矩阵</h3>
+
+<table>
+<thead>
+<tr>
+  <th style="text-align:left;"></th>
+  <th style="text-align:right;">IC显著</th>
+  <th style="text-align:right;">IC不显著</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left;">因果显著</td>
+  <td style="text-align:right;">0</td>
+  <td style="text-align:right;">2</td>
+</tr>
+<tr>
+  <td style="text-align:left;">因果不显著</td>
+  <td style="text-align:right;">2</td>
+  <td style="text-align:right;">7</td>
+</tr>
+</tbody>
+</table>
+
+<ul>
+<li>因果显著因子：['MOM60', 'TURN20']</li>
+<li>IC 显著因子：['ROA', 'ROE']</li>
+<li>伪因子（IC 显著但因果不显著）：['ROA', 'ROE']</li>
+<li>被掩盖的因子（因果显著但 IC 不显著）：['MOM60', 'TURN20']</li>
+</ul>
+
+<p><img src="figures/ic_decay_curves.png" alt="IC 衰减曲线" /></p>
+
+<p><img src="figures/crowding_ic.png" alt="拥挤度与 IC" /></p>
+
+<h2>组合回测指标</h2>
+
+<table>
+<thead>
+<tr>
+  <th style="text-align:left;"></th>
+  <th style="text-align:right;">annual_return</th>
+  <th style="text-align:right;">annual_vol</th>
+  <th style="text-align:right;">sharpe</th>
+  <th style="text-align:right;">max_drawdown</th>
+  <th style="text-align:right;">win_rate</th>
+  <th style="text-align:right;">total_return</th>
+  <th style="text-align:right;">calmar</th>
+  <th style="text-align:right;">information_ratio</th>
+  <th style="text-align:right;">sortino</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td style="text-align:left;">IC显著因子</td>
+  <td style="text-align:right;">-0.281802</td>
+  <td style="text-align:right;">0.296858</td>
+  <td style="text-align:right;">-0.949282</td>
+  <td style="text-align:right;">-0.462112</td>
+  <td style="text-align:right;">0.478261</td>
+  <td style="text-align:right;">-0.469766</td>
+  <td style="text-align:right;">-0.609813</td>
+  <td style="text-align:right;">-0.786372</td>
+  <td style="text-align:right;">-0.855718</td>
+</tr>
+<tr>
+  <td style="text-align:left;">全因子等权</td>
+  <td style="text-align:right;">-0.276118</td>
+  <td style="text-align:right;">0.268433</td>
+  <td style="text-align:right;">-1.02863</td>
+  <td style="text-align:right;">-0.477806</td>
+  <td style="text-align:right;">0.434783</td>
+  <td style="text-align:right;">-0.461694</td>
+  <td style="text-align:right;">-0.577888</td>
+  <td style="text-align:right;">-0.759398</td>
+  <td style="text-align:right;">-1.15826</td>
+</tr>
+<tr>
+  <td style="text-align:left;">因果显著因子</td>
+  <td style="text-align:right;">0.0140935</td>
+  <td style="text-align:right;">0.230772</td>
+  <td style="text-align:right;">0.061071</td>
+  <td style="text-align:right;">-0.259039</td>
+  <td style="text-align:right;">0.608696</td>
+  <td style="text-align:right;">0.0271869</td>
+  <td style="text-align:right;">0.0544069</td>
+  <td style="text-align:right;">-0.126332</td>
+  <td style="text-align:right;">0.0734633</td>
+</tr>
+</tbody>
+</table>
+
+<p><img src="figures/backtest_nav_curves.png" alt="样本外净值曲线" /></p>
+
+<p><img src="figures/backtest_sharpe_comparison.png" alt="样本外夏普对比" /></p>
+
+<h2>稳健性检验</h2>
+
+<p><img src="figures/rosenbaum_bounds.png" alt="Rosenbaum 敏感性边界" /></p>
+
+<p><img src="figures/market_regime_comparison.png" alt="分市场状态 DML 对比" /></p>
+
+<h2>识别假设与数学严谨性</h2>
+
+<ul>
+<li>平均倾向得分重叠度：0.8849</li>
+<li>共同支撑评估：良好</li>
+<li>SUTVA 高关注因子：['EP', 'BP', 'MOM20', 'MOM60', 'ROE', 'VOL20', 'TURN20', 'LIQ20', 'REV5']</li>
+</ul>
+
+<hr />
+
+<p>所有图表保存在 <code>figures/</code> 目录。正式 PDF 可通过 <code>xelatex report_cn.tex</code> 编译生成。</p>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+{
+  "matrix": {
+    "IC显著": {
+      "因果显著": 0,
+      "因果不显著": 1
+    },
+    "IC不显著": {
+      "因果显著": 3,
+      "因果不显著": 7
+    }
+  },
+  "categories": {
+    "EP": "无效因子",
+    "BP": "无效因子",
+    "MOM20": "被掩盖的因子",
+    "MOM60": "被掩盖的因子",
+    "ROE": "伪因子",
+    "ROA": "无效因子",
+    "VOL20": "无效因子",
+    "TURN20": "被掩盖的因子",
+    "LIQ20": "无效因子",
+    "GROWTH": "无效因子",
+    "REV5": "无效因子"
+  },
+  "causal_significant": [
+    "MOM20",
+    "MOM60",
+    "TURN20"
+  ],
+  "causal_signs": {
+    "MOM20": -1,
+    "MOM60": -1,
+    "TURN20": 1
+  },
+  "causal_combined_pvalue": {
+    "EP": 0.4350042558323085,
+    "BP": 0.9709693192844778,
+    "MOM20": 0.016464514828542387,
+    "MOM60": 8.895229409155991e-05,
+    "ROE": 0.22546563848521473,
+    "ROA": 0.2254656518636159,
+    "VOL20": 0.13773065056058753,
+    "TURN20": 7.6407835614134e-09,
+    "LIQ20": 0.2602576709501542,
+    "GROWTH": 0.6989395083507781,
+    "REV5": 0.7515295262091601
+  },
+  "causal_sign_consistent": {
+    "MOM20": true,
+    "MOM60": true,
+    "TURN20": false
+  },
+  "ic_significant": [
+    "ROE"
+  ],
+  "oos_ic_significant": [
+    "ROA",
+    "ROE"
+  ],
+  "spurious_factors": [
+    "ROE"
+  ],
+  "masked_factors": [
+    "MOM20",
+    "MOM60",
+    "TURN20"
+  ],
+  "true_factors": [],
+  "ineffective_factors": [
+    "BP",
+    "EP",
+    "GROWTH",
+    "LIQ20",
+    "REV5",
+    "ROA",
+    "VOL20"
+  ]
+}

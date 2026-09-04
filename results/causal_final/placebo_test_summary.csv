@@ -1,0 +1,9 @@
+placebo_type,method,n_seeds,n_sig_raw,fpr_raw,n_sig_fdr,n_sig_valid,binom_test_pvalue,fpr_inflated
+noise,CausalForest,20,1,0.05,0,1,0.6415140775914578,False
+noise,DML,20,1,0.05,0,1,0.6415140775914578,False
+noise,FrontDoor,20,3,0.15,0,1,0.07548367378849626,False
+noise,IV,20,2,0.1,0,1,0.2641604750561498,False
+shuffled,CausalForest,20,1,0.05,0,1,0.6415140775914578,False
+shuffled,DML,20,1,0.05,0,1,0.6415140775914578,False
+shuffled,FrontDoor,20,0,0.0,0,0,1.0,False
+shuffled,IV,20,1,0.05,0,1,0.6415140775914578,False
