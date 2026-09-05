@@ -23,7 +23,7 @@ from causal_factor_research.utils import (
 def test_load_features(df_full):
     assert "label" in df_full.columns
     assert all(f in df_full.columns for f in FACTORS)
-    # Rebalance dates start after 120 days of history for 120-day momentum
+    # Rebalance dates start after 60 days of history for 60-day momentum
     assert df_full["trade_date"].min().year >= 2018
     assert df_full["trade_date"].max().year >= 2023
 

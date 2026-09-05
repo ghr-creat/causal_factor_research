@@ -1,9 +1,9 @@
 """Factor comparison: causal vs. correlated factors, decay, crowding."""
-import warnings
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+from loguru import logger
 from scipy import stats
 from statsmodels.stats.multitest import multipletests
 
@@ -108,8 +108,7 @@ def classify_factors(train: pd.DataFrame, test: pd.DataFrame, causal_results: pd
     # mislabelling a factor as "IC-significant" when it is only significant OOS.
     ic_sig = set([f for i, f in enumerate(FACTORS) if not np.isnan(tstats[i]) and abs(tstats[i]) > 2.0])
     oos_ic_sig = set([f for i, f in enumerate(FACTORS) if not np.isnan(oos_tstats[i]) and abs(oos_tstats[i]) > 2.0])
-    # Do NOT merge OOS into the in-sample IC group.
-    # ic_sig = ic_sig.union(oos_ic_sig)
+    # Do NOT merge OOS significance into the in-sample IC group.
 
     # ROA is a near-perfect linear scaling of ROE in the proxy data; having both
     # in the IC-significant set double-counts a single signal. Keep only ROE if both
@@ -305,7 +304,7 @@ def run_factor_comparison(train_df: Optional[pd.DataFrame] = None, test_df: Opti
     if train_df is None or test_df is None:
         df = load_features()
         train_df, test_df = split_train_test(df)
-    print(f"Train: {len(train_df)} rows, Test: {len(test_df)} rows")
+    logger.info(f"Train: {len(train_df)} rows, Test: {len(test_df)} rows")
 
     causal_results_path = RESULTS_DIR / "causal_effects_train.csv"
     if causal_results_path.exists():

@@ -60,18 +60,14 @@ def test_period_return():
 
 
 def test_backtest_signs():
-    """Prior signs are used unless a factor has a consensus causal sign."""
+    """Backtest signs are always the fixed economic priors, independent of causal consensus."""
     records = [
-        # EP: two significant + positive ATEs -> causal sign +1 overrides prior +1 (same).
         {"factor": "EP", "method": "DML", "ate": 0.01, "pvalue": 0.01, "dml_valid": True, "iv_valid": False, "fd_valid": False, "cf_valid": False},
         {"factor": "EP", "method": "IV", "ate": 0.015, "pvalue": 0.01, "dml_valid": False, "iv_valid": True, "fd_valid": False, "cf_valid": False},
-        # MOM60: two significant ATEs with opposite signs -> no consensus, fall back to prior +1.
         {"factor": "MOM60", "method": "DML", "ate": 0.01, "pvalue": 0.01, "dml_valid": True, "iv_valid": False, "fd_valid": False, "cf_valid": False},
         {"factor": "MOM60", "method": "IV", "ate": -0.02, "pvalue": 0.01, "dml_valid": False, "iv_valid": True, "fd_valid": False, "cf_valid": False},
-        # VOL20: two significant - ATEs -> causal sign -1 overrides prior -1 (same).
         {"factor": "VOL20", "method": "DML", "ate": -0.01, "pvalue": 0.01, "dml_valid": True, "iv_valid": False, "fd_valid": False, "cf_valid": False},
         {"factor": "VOL20", "method": "CausalForest", "ate": -0.02, "pvalue": 0.01, "dml_valid": False, "iv_valid": False, "fd_valid": False, "cf_valid": True},
-        # TURN20: only one significant ATE -> no consensus, fall back to prior -1.
         {"factor": "TURN20", "method": "DML", "ate": 0.02, "pvalue": 0.01, "dml_valid": True, "iv_valid": False, "fd_valid": False, "cf_valid": False},
         {"factor": "TURN20", "method": "IV", "ate": 0.03, "pvalue": 0.08, "dml_valid": False, "iv_valid": True, "fd_valid": False, "cf_valid": False},
     ]

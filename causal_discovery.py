@@ -2,7 +2,6 @@
 import json
 import os
 import sys
-import warnings
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple

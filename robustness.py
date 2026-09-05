@@ -1,9 +1,9 @@
 """Robustness checks: placebo, time permutation, market regimes, sensitivity analysis."""
-import warnings
 from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+from loguru import logger
 from scipy import stats
 from sklearn.linear_model import LogisticRegression
 
@@ -229,14 +229,13 @@ def _summarize_placebo(placebo: pd.DataFrame) -> pd.DataFrame:
         # expected 5% under the null?  A small p-value here would mean the
         # method has inflated Type-I error.
         try:
+            # scipy >= 1.7 provides binomtest; the legacy binom_test was
+            # deprecated in 1.7 and removed in 1.12.
+            binom_p = stats.binomtest(int(sig_raw), n, p=0.05, alternative="greater").pvalue
+        except AttributeError:
             binom_p = stats.binom_test(int(sig_raw), n, p=0.05, alternative="greater")
         except Exception:
-            # scipy < 1.7 uses binom_test; newer versions use binomtest
-            try:
-                binom_res = stats.binomtest(int(sig_raw), n, p=0.05, alternative="greater")
-                binom_p = binom_res.pvalue
-            except Exception:
-                binom_p = np.nan
+            binom_p = np.nan
 
         summary.append({
             "placebo_type": ptype,
@@ -378,7 +377,7 @@ def run_all_robustness(train_df: Optional[pd.DataFrame] = None, n_seeds: int = 2
     # Rosenbaum sensitivity for top DML factors.
     rosenbaum_records = []
     for factor in top_factors:
-        print(f"Rosenbaum sensitivity for {factor}...")
+        logger.info(f"Rosenbaum sensitivity for {factor}...")
         try:
             res = rosenbaum_sensitivity(train_df, factor)
             bounds = res.get("bounds", [])
@@ -391,7 +390,7 @@ def run_all_robustness(train_df: Optional[pd.DataFrame] = None, n_seeds: int = 2
                     "baseline_pvalue": res.get("baseline_pvalue", np.nan),
                 })
         except Exception as e:
-            print(f"  failed: {e}")
+            logger.warning(f"Rosenbaum sensitivity for {factor} failed: {e}")
     rosenbaum_df = pd.DataFrame(rosenbaum_records)
     save_table(rosenbaum_df, "rosenbaum_bounds")
     results["rosenbaum"] = rosenbaum_df.to_dict(orient="records")

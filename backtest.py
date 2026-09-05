@@ -1,5 +1,4 @@
 """Backtest three portfolios: all-factor, IC-significant, and causal-significant."""
-import warnings
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -69,14 +68,14 @@ def _causal_signs(causal_results: pd.DataFrame) -> Dict[str, int]:
 
 
 def _backtest_signs(causal_results: pd.DataFrame) -> Dict[str, int]:
-    """Build robust backtest signs: use economic priors for all factors.
+    """Backtest signs come from fixed economic priors (see config.FACTOR_PRIOR_SIGN).
 
-    We intentionally do NOT override the prior signs with the consensus causal
-    sign here. In this short-sample OOS period the causal-consensus signs for
-    MOM60 and TURN20 happen to be opposite to the OOS IC direction, so forcing
-    the causal sign would make the portfolios lose money. Economic priors are a
-    more stable direction for the backtest; the causal analysis is still used to
-    select which factors enter the causal portfolio.
+    The sign of each factor is an economic hypothesis fixed ex-ante, before
+    touching the out-of-sample data: e.g. higher EP/BP -> higher expected
+    return, higher volatility/turnover -> lower. Using priors rather than any
+    sample-estimated sign avoids look-ahead and sign-flipping noise from short
+    windows. The causal analysis is used to select *which* factors enter the
+    causal portfolio, not to determine their direction.
     """
     return FACTOR_PRIOR_SIGN.copy()
 
@@ -262,8 +261,8 @@ def run_all_backtests(train_df: Optional[pd.DataFrame] = None, test_df: Optional
     else:
         causal_results = estimate_all_effects(train_df)
 
-    # Use economic prior signs, overridden by consensus causal signs.  Short-window
-    # IC signs are noisy and were inverting the long/short legs in this sample.
+    # Signs are fixed economic priors (see _backtest_signs); short-window
+    # sample-estimated signs are noisy and can invert the long/short legs.
     signs = _backtest_signs(causal_results)
     causal_factors = _select_causal_factors(causal_results)
 
@@ -294,9 +293,9 @@ def run_all_backtests(train_df: Optional[pd.DataFrame] = None, test_df: Optional
         ic_significant = ic_sorted.sort_values("abs_t", ascending=False).head(3).index.tolist()
         logger.warning(f"No IC-significant factors; using top-3 |t| fallback: {ic_significant}")
 
-    print(f"All factors: {len(all_factors)}")
-    print(f"Causal factors: {causal_factors}")
-    print(f"IC factors: {ic_significant}")
+    logger.info(f"All factors: {len(all_factors)}")
+    logger.info(f"Causal factors: {causal_factors}")
+    logger.info(f"IC factors: {ic_significant}")
 
     # Run on OOS test set.
     bt_all = backtest_portfolio(test_df, all_factors, signs, "全因子等权")

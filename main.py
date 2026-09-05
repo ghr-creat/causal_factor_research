@@ -55,43 +55,43 @@ def main(seed: int = RANDOM_SEED):
     # Step 1: Build dataset (skip if processed features already exist and raw data is unavailable)
     processed_path = PROCESSED_DIR / "causal_features.parquet"
     if processed_path.exists():
-        logger.info("[Step 1/7] 已存在 processed 数据，跳过 build_dataset()")
+        logger.info("[Step 1/8] 已存在 processed 数据，跳过 build_dataset()")
     else:
-        logger.info("[Step 1/7] 构建 11 因子真实数据集...")
+        logger.info("[Step 1/8] 构建 11 因子真实数据集...")
         t0 = time.time()
         build_dataset()
         logger.info(f"Dataset built in {time.time() - t0:.2f}s")
 
     # Step 2: Causal discovery (use training data to avoid data leakage)
-    logger.info("[Step 2/7] 因果发现...")
+    logger.info("[Step 2/8] 因果发现...")
     df = load_features()
     train_df, test_df = split_train_test(df)
     run_all_discovery(train_df)
 
     # Step 3: Causal effect estimation (strictly on training data)
-    logger.info("[Step 3/7] 因果效应估计...")
+    logger.info("[Step 3/8] 因果效应估计...")
     res = estimate_all_effects(train_df)
     plot_method_comparison(res)
     plot_ite_distribution(train_df, res)
 
     # Step 4: Factor comparison (train/test split already loaded)
-    logger.info("[Step 4/7] 因果 vs 相关因子对比...")
+    logger.info("[Step 4/8] 因果 vs 相关因子对比...")
     run_factor_comparison(train_df=train_df, test_df=test_df)
 
     # Step 5: Backtest (out-of-sample on test data only)
-    logger.info("[Step 5/7] 组合回测...")
+    logger.info("[Step 5/8] 组合回测...")
     run_all_backtests(train_df=train_df, test_df=test_df)
 
     # Step 6: Robustness (on training data)
-    logger.info("[Step 6/7] 稳健性检验...")
+    logger.info("[Step 6/8] 稳健性检验...")
     run_all_robustness(train_df=train_df, n_seeds=20)
 
-    # Step 6.5: Identification diagnostics
-    logger.info("[Step 6.5/7] 数学严谨性诊断...")
+    # Step 7: Identification diagnostics
+    logger.info("[Step 7/8] 数学严谨性诊断...")
     run_all_identification(train_df)
 
-    # Step 7: Report
-    logger.info("[Step 7/7] 生成 LaTeX PDF 报告（中英双版本）...")
+    # Step 8: Report
+    logger.info("[Step 8/8] 生成 LaTeX PDF 报告（中英双版本）...")
     generate_report()
 
     logger.info("=" * 60)

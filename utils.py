@@ -192,13 +192,6 @@ def load_causal_effects_train() -> pd.DataFrame:
     return pd.read_csv(path)
 
 
-def add_constant(df: pd.DataFrame, cols: List[str] = None) -> pd.DataFrame:
-    """Add a constant column to a dataframe."""
-    df = df.copy()
-    df["_const"] = 1.0
-    return df
-
-
 if __name__ == "__main__":
     df = load_features()
     print(f"Loaded {len(df)} rows, factors: {df[FACTORS].shape}")

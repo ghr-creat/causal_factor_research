@@ -1,6 +1,5 @@
 """Identification diagnostics: back-door criterion, do-calculus, and assumption checks."""
 import json
-import warnings
 from pathlib import Path
 from typing import Dict, List, Tuple
 

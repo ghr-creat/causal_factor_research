@@ -5,7 +5,6 @@ All four estimators now report diagnostic flags that are used in the
 counted when deciding whether a factor is "causally significant".
 """
 import json
-import warnings
 from pathlib import Path
 from typing import Dict, List, Tuple
 

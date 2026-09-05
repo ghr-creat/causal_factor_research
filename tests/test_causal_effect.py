@@ -40,11 +40,13 @@ def make_synthetic_panel(n_stocks: int = 30, n_dates: int = 20, add_mediator: bo
                 "EP": factor,
                 "future_ret_5": mediator,
                 "label": label,
-                "mkt_ret_20": 0.0,
-                "mkt_vol_20": 0.15,
-                "mkt_trend": 0.0,
-                "VOL20": 0.15,
-                "size": 1.0,
+                # Controls need non-zero variance: _get_controls drops constant
+                # columns as collinear-degenerate.
+                "mkt_ret_20": rng.normal(0, 0.001),
+                "mkt_vol_20": abs(rng.normal(0.15, 0.02)),
+                "mkt_trend": rng.normal(0, 0.02),
+                "VOL20": abs(rng.normal(0.15, 0.02)),
+                "size": rng.lognormal(0, 0.1),
             })
     return pd.DataFrame(records)
 

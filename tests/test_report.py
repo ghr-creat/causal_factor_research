@@ -8,7 +8,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from causal_factor_research.config import REPORT_DIR
+from causal_factor_research.config import FIGURES_DIR, REPORT_DIR
 from causal_factor_research.report import generate_report
 
 
@@ -22,10 +22,13 @@ def test_report_tex_files_generated():
 
 
 def test_report_figures_copied():
-    """Figures should be copied to report figures directory."""
+    """If the pipeline produced figures, they should be copied into the report directory."""
     fig_dir = REPORT_DIR / "figures"
+    src_count = len(list(FIGURES_DIR.glob("*.png"))) if FIGURES_DIR.exists() else 0
+    if src_count == 0:
+        pytest.skip("no pipeline figures available to copy")
     assert fig_dir.exists()
-    assert len(list(fig_dir.glob("*.png"))) > 0 or True  # allow empty if no figures
+    assert len(list(fig_dir.glob("*.png"))) > 0
 
 
 if __name__ == "__main__":
